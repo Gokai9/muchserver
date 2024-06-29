@@ -1,0 +1,6 @@
+@animecsharpapilist_HostAddress = http://localhost:5273
+
+GET {{animecsharpapilist_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

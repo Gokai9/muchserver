@@ -40,7 +40,7 @@ public class EmployeeController {
             return repository.save(newEmployee);
         });
     }
-    @DeleteMapping("/employess/{id}")
+    @DeleteMapping("/employees/{id}")
     void deleteEmployee(@PathVariable Long id) {
         repository.deleteById(id);
     }
