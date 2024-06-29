@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("animecsharpapilist")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f952d48e0cffdd5389bcd6179c7020f3ec1fa8e7")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+39e5ee1c30603adb1b9a6e23b68a144ec5afdea2")]
 [assembly: System.Reflection.AssemblyProductAttribute("animecsharpapilist")]
 [assembly: System.Reflection.AssemblyTitleAttribute("animecsharpapilist")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
