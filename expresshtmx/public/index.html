@@ -1,0 +1,23 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMX</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+</head>
+<body>
+    <form hx-post="/add" hx-target="#profile" hx-swap="outerHTML" class="flex items-center justify-beetween border-solid">
+        <label for="name">
+            <input type="text" name="name" id="name">
+        </label>
+        <label for="email">
+            <input type="email" name="email" id="email">
+        </label>
+        <button type="submit">
+            Submit
+        </button>
+    </form>
+    <div id="profile"></div>
+</body>
+</html>
