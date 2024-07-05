@@ -1,6 +1,9 @@
 package controller
 
 import (
+	"fmt"
+	"goweb/models"
+	"io"
 	"net/http"
 	"regexp"
 )
@@ -12,7 +15,16 @@ var (
 
 type AnimeHandler struct{}
 
-func (anime *AnimeHandler) CreateAnime(w http.ResponseWriter, r *http.Request) {}
+var db, err = models.OpenDb()
+
+func (anime *AnimeHandler) CreateAnime(w http.ResponseWriter, r *http.Request) {
+	b, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte("There no file"))
+	}
+	fmt.Println(string(b))
+}
 func (anime *AnimeHandler) GetAllAnime(w http.ResponseWriter, r *http.Request) {}
 func (anime *AnimeHandler) GetAnime(w http.ResponseWriter, r *http.Request)    {}
 func (anime *AnimeHandler) UpdateAnime(w http.ResponseWriter, r *http.Request) {}
