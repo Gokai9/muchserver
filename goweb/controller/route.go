@@ -1,12 +1,18 @@
 package controller
 
 import (
-	"fmt"
+	"encoding/json"
 	"goweb/models"
 	"io"
+	"log"
 	"net/http"
 	"regexp"
 )
+
+type AnimeDetail struct {
+	Title   string
+	Episode int
+}
 
 var (
 	AnimeRe       = regexp.MustCompile(`^/anime/*$`)
@@ -15,15 +21,32 @@ var (
 
 type AnimeHandler struct{}
 
-var db, err = models.OpenDb()
+type animes []models.Anime
 
 func (anime *AnimeHandler) CreateAnime(w http.ResponseWriter, r *http.Request) {
+	var db, err = models.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
 		w.WriteHeader(400)
 		w.Write([]byte("There no file"))
+		log.Fatal(err)
 	}
-	fmt.Println(string(b))
+	var ani AnimeDetail
+	err = json.Unmarshal(b, &ani)
+	if err != nil {
+		w.WriteHeader(400)
+		log.Fatal(err)
+	}
+	_, err = db.AddAnime(ani.Title, ani.Episode)
+	if err != nil {
+		w.WriteHeader(400)
+		log.Fatal(err)
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("Succes"))
 }
 func (anime *AnimeHandler) GetAllAnime(w http.ResponseWriter, r *http.Request) {}
 func (anime *AnimeHandler) GetAnime(w http.ResponseWriter, r *http.Request)    {}

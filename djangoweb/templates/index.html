@@ -1,0 +1,17 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Posts</h1>
+    <div>
+        {%for post in posts%}
+        {%load custom_tag%}
+        <h2>{{post.title|random_title}}</h2>
+        <p>{{post.body}}</p>
+        {%endfor%}
+    </div>
+</body>
+</html>

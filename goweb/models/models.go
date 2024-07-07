@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -36,8 +37,10 @@ func OpenDb() (*AnimeDB, error) {
 	return &AnimeDB{db: db}, nil
 }
 
-func (a *AnimeDB) AddAnime(anime Anime) (int, error) {
-	result, err := a.db.Exec("INSERT INTO anime VALUES(NULL, ?, ?)", anime.title, anime.episode)
+func (a *AnimeDB) AddAnime(title string, episode int) (int, error) {
+	fmt.Println(title, episode)
+	result, err := a.db.Exec("INSERT INTO anime VALUES(NULL,?,?);", title,
+		episode)
 	if err != nil {
 		return 0, err
 	}
@@ -49,7 +52,7 @@ func (a *AnimeDB) AddAnime(anime Anime) (int, error) {
 }
 
 func (a *AnimeDB) GetAll() ([]Anime, error) {
-	rows, err := a.db.Query("SELECT * FROM anime")
+	rows, err := a.db.Query("SELECT * FROM anime;")
 	if err != nil {
 		return nil, err
 	}
@@ -66,19 +69,19 @@ func (a *AnimeDB) GetAll() ([]Anime, error) {
 }
 
 func (a *AnimeDB) GetById(id int) Anime {
-	row := a.db.QueryRow("SELECT * FROM anime WHERE id = ?", id)
+	row := a.db.QueryRow("SELECT * FROM anime WHERE id = ?;", id)
 	var anime Anime
 	row.Scan(&anime.id, &anime.title, &anime.episode)
 	return anime
 }
 
 func (a *AnimeDB) UpdateById(anime Anime) Anime {
-	row := a.db.QueryRow("UPDATE anime SET title=?, episode=? WHERE id = ?", anime.title, anime.episode, anime.id)
+	row := a.db.QueryRow("UPDATE anime SET title=?, episode=? WHERE id = ?;", anime.title, anime.episode, anime.id)
 	var animes Anime
 	row.Scan(&animes.id, &animes.title, &animes.episode)
 	return animes
 }
 
 func (a *AnimeDB) DeleteById(id int) {
-	a.db.Exec("DELETE FROM anime WHERE id = ?", id)
+	a.db.Exec("DELETE FROM anime WHERE id = ?;", id)
 }
