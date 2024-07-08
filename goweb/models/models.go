@@ -9,9 +9,13 @@ import (
 
 // id title eps
 type Anime struct {
-	id      int
-	title   string
-	episode int
+	Id      int    `json:"id"`
+	Title   string `json:"title"`
+	Episode int    `json:"episode"`
+}
+type AnimeDetail struct {
+	Title   string `json:"title"`
+	Episode int    `json:"episode"`
 }
 
 type AnimeDB struct {
@@ -26,7 +30,7 @@ const create string = `
   );`
 
 func OpenDb() (*AnimeDB, error) {
-	db, err := sql.Open("sqlite3", "anime.db")
+	db, err := sql.Open("sqlite3", "./anime.db")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +63,7 @@ func (a *AnimeDB) GetAll() ([]Anime, error) {
 	var animes []Anime
 	for rows.Next() {
 		var anime Anime
-		err = rows.Scan(&anime.id, &anime.title, &anime.episode)
+		err = rows.Scan(&anime.Id, &anime.Title, &anime.Episode)
 		if err != nil {
 			return nil, err
 		}
@@ -71,14 +75,14 @@ func (a *AnimeDB) GetAll() ([]Anime, error) {
 func (a *AnimeDB) GetById(id int) Anime {
 	row := a.db.QueryRow("SELECT * FROM anime WHERE id = ?;", id)
 	var anime Anime
-	row.Scan(&anime.id, &anime.title, &anime.episode)
+	row.Scan(&anime.Id, &anime.Title, &anime.Episode)
 	return anime
 }
 
-func (a *AnimeDB) UpdateById(anime Anime) Anime {
-	row := a.db.QueryRow("UPDATE anime SET title=?, episode=? WHERE id = ?;", anime.title, anime.episode, anime.id)
+func (a *AnimeDB) UpdateById(anime AnimeDetail, id int) Anime {
+	row := a.db.QueryRow("UPDATE anime SET title=?, episode=? WHERE id = ?;", anime.Title, anime.Episode, id)
 	var animes Anime
-	row.Scan(&animes.id, &animes.title, &animes.episode)
+	row.Scan(&animes.Id, &animes.Title, &animes.Episode)
 	return animes
 }
 

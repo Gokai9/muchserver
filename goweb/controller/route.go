@@ -6,77 +6,76 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"regexp"
+	"strconv"
 )
 
-type AnimeDetail struct {
-	Title   string
-	Episode int
+type AnimeHandler struct {
+	*models.AnimeDB
 }
 
-var (
-	AnimeRe       = regexp.MustCompile(`^/anime/*$`)
-	AnimeReWithID = regexp.MustCompile(`^/anime/([a-z0-9]+(?:-[a-z0-9]+)+)$`)
-)
+func New() *AnimeHandler {
+	db, err := models.OpenDb()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return &AnimeHandler{db}
+}
 
-type AnimeHandler struct{}
-
-type animes []models.Anime
+func logError(w http.ResponseWriter, err error, status int) {
+	if err != nil {
+		w.WriteHeader(status)
+		w.Write([]byte(err.Error()))
+		log.Println(err.Error())
+		return
+	}
+}
 
 func (anime *AnimeHandler) CreateAnime(w http.ResponseWriter, r *http.Request) {
-	var db, err = models.OpenDb()
-	if err != nil {
-		log.Fatal(err)
-	}
 	b, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(400)
-		w.Write([]byte("There no file"))
-		log.Fatal(err)
-	}
-	var ani AnimeDetail
+	logError(w, err, http.StatusBadRequest)
+	var ani models.AnimeDetail
 	err = json.Unmarshal(b, &ani)
-	if err != nil {
-		w.WriteHeader(400)
-		log.Fatal(err)
-	}
-	_, err = db.AddAnime(ani.Title, ani.Episode)
-	if err != nil {
-		w.WriteHeader(400)
-		log.Fatal(err)
-	}
+	logError(w, err, http.StatusBadGateway)
+	_, err = anime.AddAnime(ani.Title, ani.Episode)
+	logError(w, err, http.StatusBadGateway)
 	w.WriteHeader(200)
 	w.Write([]byte("Succes"))
 }
-func (anime *AnimeHandler) GetAllAnime(w http.ResponseWriter, r *http.Request) {}
-func (anime *AnimeHandler) GetAnime(w http.ResponseWriter, r *http.Request)    {}
-func (anime *AnimeHandler) UpdateAnime(w http.ResponseWriter, r *http.Request) {}
-func (anime *AnimeHandler) DeleteAnime(w http.ResponseWriter, r *http.Request) {}
+func (anime *AnimeHandler) GetAllAnime(w http.ResponseWriter, r *http.Request) {
+	ani, err := anime.GetAll()
+	logError(w, err, http.StatusBadRequest)
+	js, err := json.Marshal(ani)
+	logError(w, err, http.StatusBadRequest)
 
-func (anime *AnimeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case http.MethodGet == r.Method && AnimeRe.MatchString(r.URL.Path):
-		anime.GetAllAnime(w, r)
-		return
-	case http.MethodGet == r.Method && AnimeReWithID.MatchString(r.URL.Path):
-		anime.GetAnime(w, r)
-		return
-	case http.MethodPost == r.Method && AnimeRe.MatchString(r.URL.Path):
-		anime.CreateAnime(w, r)
-		return
-	case http.MethodPut == r.Method && AnimeReWithID.MatchString(r.URL.Path):
-		anime.UpdateAnime(w, r)
-		return
-	case http.MethodDelete == r.Method && AnimeReWithID.MatchString(r.URL.Path):
-		anime.DeleteAnime(w, r)
-		return
-	default:
-		return
-	}
+	w.Write(js)
 }
+func (anime *AnimeHandler) GetAnime(w http.ResponseWriter, r *http.Request) {
+	ids := r.PathValue("id")
+	id, _ := strconv.Atoi(ids)
+	ani := anime.GetById(id)
+	js, err := json.Marshal(ani)
+	logError(w, err, http.StatusBadRequest)
 
-type HomeHandler struct{}
+	w.Write(js)
 
-func (home *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("haha"))
+}
+func (anime *AnimeHandler) UpdateAnime(w http.ResponseWriter, r *http.Request) {
+	b, err := io.ReadAll(r.Body)
+	logError(w, err, http.StatusBadRequest)
+	var ani models.AnimeDetail
+	err = json.Unmarshal(b, &ani)
+	logError(w, err, http.StatusBadGateway)
+	ids := r.PathValue("id")
+	id, _ := strconv.Atoi(ids)
+	ani := anime.UpdateById(ani, id)
+	js, err := json.Marshal(ani)
+	logError(w, err, http.StatusBadRequest)
+
+	w.Write(js)
+}
+func (anime *AnimeHandler) DeleteAnime(w http.ResponseWriter, r *http.Request) {
+	ids := r.PathValue("id")
+	id, _ := strconv.Atoi(ids)
+	anime.DeleteById(id)
+	w.Write([]byte("ok"))
 }
