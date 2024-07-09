@@ -67,8 +67,8 @@ func (anime *AnimeHandler) UpdateAnime(w http.ResponseWriter, r *http.Request) {
 	logError(w, err, http.StatusBadGateway)
 	ids := r.PathValue("id")
 	id, _ := strconv.Atoi(ids)
-	ani := anime.UpdateById(ani, id)
-	js, err := json.Marshal(ani)
+	anim := anime.UpdateById(ani, id)
+	js, err := json.Marshal(anim)
 	logError(w, err, http.StatusBadRequest)
 
 	w.Write(js)
